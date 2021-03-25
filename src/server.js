@@ -6,7 +6,15 @@
 // });
 
 const express = require("express");
+const cors = require("cors");
+const { CLIENT_ORIGIN } = require("./config");
 const app = express();
+
+app.use(
+  cors({
+    origin: CLIENT_ORIGIN,
+  })
+);
 
 const PORT = process.env.PORT || 3000;
 
