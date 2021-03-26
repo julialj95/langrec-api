@@ -19,11 +19,11 @@ function makeResourcesArray() {
       image_link:
         "https://images-na.ssl-images-amazon.com/images/I/51JwrB7zAcL._SX348_BO1,204,203,200_.jpg",
       language: "Spanish",
-      level: "Intermediate",
-      type: "Website",
+      level: "Beginner",
+      type: "Textbook",
       rating: "4",
       url: "http://www.test-url-2.com",
-      cost: "Free",
+      cost: "Paid",
       description: "Test description 2...",
     },
     {

@@ -20,4 +20,23 @@ ResourcesRouter.route("/")
     ResourcesService.submitResource(req.app.get("db")).then(response);
   });
 
+ResourcesRouter.route("/recs").get((req, res, next) => {
+  const { language, level, type, cost } = req.query;
+
+  ResourcesService.getRecommendedResources(
+    req.app.get("db"),
+    language,
+    level,
+    type,
+    cost
+  )
+    .then((resources) => {
+      if (!resources) {
+        return res.status(400).send("No resources found.");
+      }
+      res.json(resources);
+    })
+    .catch(next);
+});
+
 module.exports = ResourcesRouter;

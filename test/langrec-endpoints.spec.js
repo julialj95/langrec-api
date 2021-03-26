@@ -3,6 +3,7 @@ const knex = require("knex");
 const app = require("../src/langrec-app");
 const { API_KEY } = require("../src/config");
 const { makeResourcesArray } = require("./resources-fixture");
+const supertest = require("supertest");
 
 describe("Langrec endpoints", function () {
   let db;
@@ -46,6 +47,35 @@ describe("Langrec endpoints", function () {
             .get("/api/resources")
             .set("Authorization", "Bearer " + API_KEY)
             .expect(200, testResources);
+        });
+      });
+    });
+    describe("GET /api/resources/recs", () => {
+      const testResources = makeResourcesArray();
+      beforeEach("insert test resources", () => {
+        return db.into("resources").insert(testResources);
+      });
+      context(
+        "Given resources in the database, but none match the requirements",
+        () => {
+          it("Responds with 200 and an empty list", () => {
+            const testQuery =
+              "language=Spanish&type=Workbook&level=Advanced&cost=Paid";
+            return supertest(app)
+              .get(`/api/resources/recs?${testQuery}`)
+              .set("Authorization", "Bearer " + API_KEY)
+              .expect(200, []);
+          });
+        }
+      );
+      context("Given a resource matches the requirements", () => {
+        it("Responds with 200 and the matching resources", () => {
+          const testQuery =
+            "language=Spanish&type=Textbook&level=Beginner&cost=Paid";
+          return supertest(app)
+            .get(`/api/resources/recs?${testQuery}`)
+            .set("Authorization", "Bearer " + API_KEY)
+            .expect(200, [testResources[1]]);
         });
       });
     });
