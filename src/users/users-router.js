@@ -6,3 +6,5 @@ const jsonParser = express.json();
 const UsersRouter = express.Router();
 
 UsersRouter.route("/").get((req, res, next) => {});
+
+module.exports = UsersRouter;
