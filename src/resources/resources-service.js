@@ -12,10 +12,6 @@ const ResourcesService = {
       .where({ language, level, type, cost });
   },
 
-  // getResourcesByUserId(knex, id) {
-  //   return knex.select("*").from("resources").where({ id });
-  // },
-
   submitResource(knex, newResource) {
     return knex("resources")
       .insert(newResource)
