@@ -79,5 +79,51 @@ describe("Langrec endpoints", function () {
         });
       });
     });
+    describe("PATCH /api/resources/:resource_id", () => {
+      context(`Given no resources in the database`, () => {
+        it(`responds with 404`, () => {
+          const resource_id = 123456789;
+          return supertest(app)
+            .patch(`/api/resources/${resource_id}`)
+            .set("Authorization", "Bearer " + API_KEY)
+            .expect(404, { error: { message: `Resource doesn't exist` } });
+        });
+      });
+      context(`Given resources in the database`, () => {
+        const testResources = makeResourcesArray();
+        beforeEach("insert test resources", () => {
+          return db.into("resources").insert(testResources);
+        });
+        it(`Responds with 204 and updates the resource`, () => {
+          const idToUpdate = 2;
+          const updateResource = {
+            title: "Updated Resource Name",
+            image_link: "http://www.image.jpg",
+            language: "Spanish",
+            level: "Beginner",
+            type: "Textbook",
+            rating: 5,
+            url: "http://www.amazon.com/resource",
+            description: "Updated resource description",
+            cost: "Free",
+          };
+          const expectedResource = {
+            ...testResources[idToUpdate - 1],
+            ...updateResource,
+          };
+          return supertest(app)
+            .patch(`/api/resources/${idToUpdate}`)
+            .set("Authorization", "Bearer " + API_KEY)
+            .send(updateResource)
+            .expect(204)
+            .then(() =>
+              supertest(app)
+                .get(`/api/resources/${idToUpdate}`)
+                .set("Authorization", "Bearer " + API_KEY)
+                .expect(expectedResource)
+            );
+        });
+      });
+    });
   });
 });

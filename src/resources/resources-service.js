@@ -2,6 +2,9 @@ const ResourcesService = {
   getAllResources(knex) {
     return knex.select("*").from("resources");
   },
+  getResourceById(knex, id) {
+    return knex.select("*").where({ id }).first();
+  },
   getResourcesByLanguage(knex, language) {
     return knex.select("*").from("resources").where({ language });
   },
@@ -17,6 +20,10 @@ const ResourcesService = {
       .insert(newResource)
       .returning("*")
       .then((rows) => rows[0]);
+  },
+
+  updateResource(knex, id, updatedResource) {
+    return knex.from("resources").where("id", id).update(updatedResource);
   },
 };
 
