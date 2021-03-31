@@ -25,6 +25,7 @@ const ResourcesService = {
   updateResource(knex, id, updatedResource) {
     return knex.from("resources").where("id", id).update(updatedResource);
   },
+  saveAResource(knex, user_id, resource_id) {},
 };
 
 module.exports = ResourcesService;

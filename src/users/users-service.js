@@ -35,6 +35,9 @@ const usersService = {
   getAllUsers(knex) {
     return knex.select("*").from("users");
   },
+  getUserByUsername(knex, username) {
+    return knex.select("*").from("users").where({ username }).first();
+  },
   getSavedResourcesIds(knex, user_id) {
     return knex.select("*").from("saved_resources").where({ user_id });
   },

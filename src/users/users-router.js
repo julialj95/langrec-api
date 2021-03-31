@@ -80,12 +80,15 @@ UsersRouter.route("/:user_id")
     );
   })
   .get((req, res, next) => {
-    const { user_id } = req.params;
-
-    UsersService.getSavedResourcesIds(
-      req.app.get("db"),
-      user_id
-    ).then((resources) => {});
+    const username = user.username;
   });
+// .get((req, res, next) => {
+//   const { user_id } = req.params;
+
+//   UsersService.getSavedResourcesIds(
+//     req.app.get("db"),
+//     user_id
+//   ).then((resources) => {});
+// });
 
 module.exports = UsersRouter;
