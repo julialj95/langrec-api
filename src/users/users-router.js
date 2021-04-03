@@ -65,30 +65,18 @@ UsersRouter.route("/")
       .catch(next);
   });
 
-UsersRouter.route("/:user_id")
-  .all((req, res, next) => {
-    UsersService.getUserById(req.app.get("db"), req.params.user_id).then(
-      (user) => {
-        if (!user) {
-          return res.status(404).json({
-            error: { message: `User doesn't exist` },
-          });
-        }
-        res.user = user;
-        next();
+UsersRouter.route("/:user_id").all((req, res, next) => {
+  UsersService.getUserById(req.app.get("db"), req.params.user_id).then(
+    (user) => {
+      if (!user) {
+        return res.status(404).json({
+          error: { message: `User doesn't exist` },
+        });
       }
-    );
-  })
-  .get((req, res, next) => {
-    const username = user.username;
-  });
-// .get((req, res, next) => {
-//   const { user_id } = req.params;
-
-//   UsersService.getSavedResourcesIds(
-//     req.app.get("db"),
-//     user_id
-//   ).then((resources) => {});
-// });
+      res.user = user;
+      next();
+    }
+  );
+});
 
 module.exports = UsersRouter;

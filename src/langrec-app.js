@@ -4,7 +4,8 @@ const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
 const { NODE_ENV } = require("./config.js");
-const api_authorization = require("./api_validation");
+// const api_authorization = require("./api_validation");
+const { requireAuth } = require("./middleware/jwt-auth");
 const errorHandler = require("./error-handler");
 const { CLIENT_ORIGIN } = require("./config");
 const ResourcesRouter = require("./resources/resource-router");
@@ -22,18 +23,16 @@ app.get("/", (req, res) => {
   res.send("Hello, world!");
 });
 
-// app.use(
-//   cors({
-//     origin: CLIENT_ORIGIN,
-//   })
-// );
+app.use(
+  cors({
+    origin: CLIENT_ORIGIN,
+  })
+);
 
-app.use(api_authorization);
-
-app.use(errorHandler);
-
-app.use("/api/resources", ResourcesRouter);
-app.use("/api/users", UsersRouter);
 app.use("/api/authorization", AuthorizationRouter);
+app.use("/api/users", UsersRouter);
+app.use(errorHandler);
+// app.use(requireAuth);
+app.use("/api/resources", ResourcesRouter);
 
 module.exports = app;

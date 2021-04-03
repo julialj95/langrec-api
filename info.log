@@ -1,2 +1,6 @@
 {"message":"Unauthorized request to path: /api/","level":"error"}
 {"message":"Unauthorized request to path: /api/authorization/login","level":"error"}
+{"message":"Unauthorized request to path: /api/users/undefined","level":"error"}
+{"message":"Unauthorized request to path: /api/users/undefined","level":"error"}
+{"message":"Unauthorized request to path: /api/users/undefined","level":"error"}
+{"message":"Unauthorized request to path: /api/resources/recs","level":"error"}

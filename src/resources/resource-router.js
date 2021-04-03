@@ -2,8 +2,22 @@ const express = require("express");
 const xss = require("xss");
 const path = require("path");
 const ResourcesService = require("./resources-service");
+const { requireAuth } = require("../middleware/jwt-auth");
 const jsonParser = express.json();
 const ResourcesRouter = express.Router();
+
+serializeResource = (newResource) => ({
+  id: newResource.id,
+  title: xss(newResource.title),
+  image_link: xss(newResource.image_link),
+  language: newResource.language,
+  level: newResource.level,
+  type: newResource.type,
+  rating: newResource.rating,
+  url: xss(newResource.url),
+  description: xss(newResource.description),
+  cost: newResource.cost,
+});
 
 ResourcesRouter.route("/")
   .get((req, res, next) => {
@@ -16,7 +30,7 @@ ResourcesRouter.route("/")
       })
       .catch(next);
   })
-  .post((req, res, next) => {
+  .post(requireAuth, (req, res, next) => {
     const {
       title,
       image_link,
@@ -58,24 +72,96 @@ ResourcesRouter.route("/")
       .catch(next);
   });
 
-ResourcesRouter.route("/recs").get((req, res, next) => {
-  const { language, level, type, cost } = req.query;
+ResourcesRouter.route("/saved-resources").get(requireAuth, (req, res, next) => {
+  const user_id = req.user.id;
 
-  ResourcesService.getRecommendedResources(
-    req.app.get("db"),
-    language,
-    level,
-    type,
-    cost
-  )
+  ResourcesService.getSavedResourceIds(req.app.get("db"), user_id)
     .then((resources) => {
       if (!resources) {
-        return res.status(400).send("No resources found.");
+        return res.status(404).json({
+          error: { message: `No saved resources` },
+        });
       }
-      res.json(resources);
+      const resourceIds = resources.map((resource) => resource.resource_id);
+      return ResourcesService.getSavedResourcesFromIds(
+        req.app.get("db"),
+        resourceIds
+      ).then((response) => {
+        if (!response) {
+          return res.status(404).json({
+            error: { message: `No resources found` },
+          });
+        }
+        return res.json(response);
+      });
     })
     .catch(next);
 });
+ResourcesRouter.route("/saved-resources/:resource_id").delete(
+  requireAuth,
+  (req, res, next) => {
+    const resource_id = req.params.resource_id;
+    const user_id = req.user.id;
+    ResourcesService.deleteResourceFromFavorites(
+      req.app.get("db"),
+      user_id,
+      resource_id
+    )
+      .then(() => {
+        res.status(204).end();
+      })
+      .catch(next);
+  }
+);
+
+ResourcesRouter.route("/recs")
+  .get((req, res, next) => {
+    const { language, level, type, cost } = req.query;
+
+    ResourcesService.getRecommendedResources(
+      req.app.get("db"),
+      language,
+      level,
+      type,
+      cost
+    )
+      .then((resources) => {
+        console.log("resources response length", resources.length);
+        if (resources.length === 0) {
+          return res.status(404).send("No resources found.");
+        }
+        res.json(resources);
+      })
+      .catch(next);
+  })
+  .post(jsonParser, requireAuth, (req, res, next) => {
+    const user_id = req.user.id;
+    console.log("user_id", user_id);
+    const { resource_id } = req.body;
+    console.log("resource_id", resource_id);
+    const newSavedResource = { user_id, resource_id };
+
+    for (const [key, value] of Object.entries(newSavedResource))
+      if (value == null)
+        return res.status(400).json({
+          error: `Missing '${key}' in request body`,
+        });
+
+    ResourcesService.saveAResource(req.app.get("db"), newSavedResource)
+      .then((resource) => {
+        console.log(resource);
+        res
+          .status(201)
+          .location(path.posix.join(req.originalUrl + `/${resource.id}`))
+          .json({
+            id: resource.id,
+            user_id: resource.user_id,
+            resource_id: resource.resource_id,
+          });
+      })
+      .catch(next);
+  });
+
 ResourcesRouter.route("/:resource_id")
   .all((req, res, next) => {
     const { resource_id } = req.params;
@@ -91,7 +177,7 @@ ResourcesRouter.route("/:resource_id")
       }
     );
   })
-  .patch(jsonParser, (req, res, next) => {
+  .patch(requireAuth, jsonParser, (req, res, next) => {
     const { resource_id } = req.params;
     const {
       title,
