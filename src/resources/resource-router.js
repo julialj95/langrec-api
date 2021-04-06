@@ -102,6 +102,19 @@ ResourcesRouter.route("/saved-resources/:resource_id").delete(
   (req, res, next) => {
     const resource_id = req.params.resource_id;
     const user_id = req.user.id;
+    ResourcesService.getSavedResourceIds(req.app.get("db"), user_id)
+      .then((resource) => {
+        const results = resource.filter(
+          (item) => item.resource_id === Number(resource_id)
+        );
+        if (results.length === 0) {
+          return res.status(404).json({
+            error: `Resource doesn't exist.`,
+          });
+        }
+      })
+      .catch(next);
+
     ResourcesService.deleteResourceFromFavorites(
       req.app.get("db"),
       user_id,
@@ -126,9 +139,8 @@ ResourcesRouter.route("/recs")
       cost
     )
       .then((resources) => {
-        console.log("resources response length", resources.length);
         if (resources.length === 0) {
-          return res.status(404).send("No resources found.");
+          return res.status(200).send("No resources found.");
         }
         res.json(resources);
       })
@@ -136,9 +148,7 @@ ResourcesRouter.route("/recs")
   })
   .post(jsonParser, requireAuth, (req, res, next) => {
     const user_id = req.user.id;
-    console.log("user_id", user_id);
     const { resource_id } = req.body;
-    console.log("resource_id", resource_id);
     const newSavedResource = { user_id, resource_id };
 
     for (const [key, value] of Object.entries(newSavedResource))
@@ -149,7 +159,6 @@ ResourcesRouter.route("/recs")
 
     ResourcesService.saveAResource(req.app.get("db"), newSavedResource)
       .then((resource) => {
-        console.log(resource);
         res
           .status(201)
           .location(path.posix.join(req.originalUrl + `/${resource.id}`))

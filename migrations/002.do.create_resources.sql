@@ -7,6 +7,6 @@ CREATE TABLE resources(
   type TEXT NOT NULL,
   rating INTEGER NOT NULL,
   url TEXT NOT NULL,
-  description TEXT,
-  cost TEXT NOT NULL
+  cost TEXT NOT NULL,
+  description TEXT
 );
