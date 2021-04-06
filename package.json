@@ -10,6 +10,9 @@
     "migrate:production": "heroku run npm run migrate",
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
+    "seed-resources": "heroku pg:psql DATABASE_URL --app cryptic-dusk-22121 < seeds/seed.resources.sql",
+    "seed-users": "heroku pg:psql DATABASE_URL --app cryptic-dusk-22121 < seeds/seed.users.sql",
+    "seed-saved-resources": "heroku pg:psql DATABASE_URL --app cryptic-dusk-22121 < seeds/seed.saved_resources.sql",
     "predeploy": "npm audit",
     "deploy": "git push heroku main",
     "postdeploy": "npm run migrate:production"
