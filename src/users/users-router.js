@@ -57,8 +57,7 @@ UsersRouter.route("/")
             .json({
               id: user.id,
               username: xss(user.username),
-              password: xss(user.password),
-              //should password be included here? Where does this json response show up?
+              // password: xss(user.password),
             });
         });
       })

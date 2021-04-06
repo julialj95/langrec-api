@@ -12,7 +12,6 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
     subject: user.username,
     algorithm: "HS256",
   });
-  console.log(token);
   return `Bearer ${token}`;
 }
 
@@ -69,7 +68,6 @@ describe("Langrec endpoints", function () {
     //   beforeEach("insert test users into database", () => {
     //     return db.into("users").insert(testUsers);
     //   });
-    //   console.log("auth header", makeAuthHeader(testUsers[0]));
     //   it("Creates a new resource and responds with 201 and the submitted resource", () => {
     //     const newResource = {
     //       title: "Test resource",
@@ -228,7 +226,7 @@ describe("Langrec endpoints", function () {
         });
       });
     });
-    describe.only("DELETE /api/resources/saved-resource/:resource_id", () => {
+    describe("DELETE /api/resources/saved-resource/:resource_id", () => {
       const testUsers = makeUsersArray();
       beforeEach("insert test users into database", () => {
         return db.into("users").insert(testUsers);
