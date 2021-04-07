@@ -10,10 +10,10 @@ const usersService = {
   },
   validatePassword(password) {
     if (password.length < 8) {
-      return "Please make a password containing 8 or more characters.";
+      return "Please choose a password containing 8 or more characters.";
     }
     if (password.length > 72) {
-      return "Please make a password containing fewer than 72 characters.";
+      return "Please choose a password containing fewer than 72 characters.";
     }
     if (password.includes(" ")) {
       return "Password must not contain empty spaces";
