@@ -12,7 +12,7 @@ Get Recs: GET /api/resources/recs
 
 ## Endpoints that require Authentication
 
-Closed endpoints require a valid Token to be included in the header of the request. Token can be access from login request.
+Closed endpoints require a valid Token to be included in the header of the request. 
 
 Get saved resources : GET /api/resources/saved-resources
 
