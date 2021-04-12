@@ -31,8 +31,7 @@ app.use(
 
 app.use("/api/authorization", AuthorizationRouter);
 app.use("/api/users", UsersRouter);
-app.use(errorHandler);
-// app.use(requireAuth);
 app.use("/api/resources", ResourcesRouter);
+app.use(errorHandler);
 
 module.exports = app;

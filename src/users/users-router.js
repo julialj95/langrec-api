@@ -57,7 +57,6 @@ UsersRouter.route("/")
             .json({
               id: user.id,
               username: xss(user.username),
-              // password: xss(user.password),
             });
         });
       })

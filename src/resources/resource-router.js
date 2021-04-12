@@ -19,58 +19,16 @@ serializeResource = (newResource) => ({
   cost: newResource.cost,
 });
 
-ResourcesRouter.route("/")
-  .get((req, res, next) => {
-    ResourcesService.getAllResources(req.app.get("db"))
-      .then((resources) => {
-        if (!resources) {
-          return res.status(400).send("No resources found.");
-        }
-        res.json(resources);
-      })
-      .catch(next);
-  })
-  .post(requireAuth, (req, res, next) => {
-    const {
-      title,
-      image_link,
-      language,
-      level,
-      type,
-      rating,
-      url,
-      description,
-      cost,
-    } = req.body;
-    const newResource = {
-      title,
-      image_link,
-      language,
-      level,
-      type,
-      rating,
-      url,
-      description,
-      cost,
-    };
-
-    for (const [key, value] of Object.entries(newResource)) {
-      if (value == null) {
-        return res.status(400).json({
-          error: { message: `Missing ${key} in request body` },
-        });
+ResourcesRouter.route("/").get((req, res, next) => {
+  ResourcesService.getAllResources(req.app.get("db"))
+    .then((resources) => {
+      if (!resources) {
+        return res.status(400).send("No resources found.");
       }
-    }
-
-    ResourcesService.submitResource(req.app.get("db"), newResource)
-      .then((resource) => {
-        return res
-          .status(201)
-          .location(path.posix.join(req.originalUrl) + `/${resource[0].id}`)
-          .json(serializeResource(resource[0]));
-      })
-      .catch(next);
-  });
+      res.json(resources);
+    })
+    .catch(next);
+});
 
 ResourcesRouter.route("/saved-resources").get(requireAuth, (req, res, next) => {
   const user_id = req.user.id;
