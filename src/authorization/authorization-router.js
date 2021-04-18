@@ -1,6 +1,5 @@
 const express = require("express");
 const AuthorizationService = require("./authorization-service");
-// const { requireAuth } = require("../middleware/jwt-auth");
 
 const authorizationRouter = express.Router();
 const jsonBodyParser = express.json();
