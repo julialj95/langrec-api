@@ -8,6 +8,7 @@ const ResourcesRouter = express.Router();
 
 serializeResource = (newResource) => ({
   id: newResource.id,
+  user_id: newResource.user_id,
   title: xss(newResource.title),
   image_link: xss(newResource.image_link),
   language: newResource.language,
@@ -19,16 +20,52 @@ serializeResource = (newResource) => ({
   cost: newResource.cost,
 });
 
-ResourcesRouter.route("/").get((req, res, next) => {
-  ResourcesService.getAllResources(req.app.get("db"))
-    .then((resources) => {
-      if (!resources) {
-        return res.status(400).send("No resources found.");
+ResourcesRouter.route("/")
+  .get((req, res, next) => {
+    ResourcesService.getAllResources(req.app.get("db"))
+      .then((resources) => {
+        if (!resources) {
+          return res.status(400).send("No resources found.");
+        }
+        res.json(resources);
+      })
+      .catch(next);
+  })
+  .post(requireAuth, jsonParser, (req, res, next) => {
+    const user_id = req.user.id;
+    const {
+      title,
+      image_link,
+      language,
+      level,
+      type,
+      rating,
+      url,
+      cost,
+      description,
+    } = req.body;
+    const newResource = {
+      user_id,
+      title,
+      image_link,
+      language,
+      level,
+      type,
+      rating,
+      url,
+      cost,
+      description,
+    };
+
+    ResourcesService.submitResource(req.app.get("db"), newResource).then(
+      (response) => {
+        res
+          .status(201)
+          .location(path.posix.join(req.originalUrl + `${user_id}`))
+          .send(() => serializeResource(response));
       }
-      res.json(resources);
-    })
-    .catch(next);
-});
+    );
+  });
 
 ResourcesRouter.route("/saved-resources").get(requireAuth, (req, res, next) => {
   const user_id = req.user.id;

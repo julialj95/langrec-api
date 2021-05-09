@@ -1,4 +1,3 @@
-const { expect } = require("chai");
 const knex = require("knex");
 const jwt = require("jsonwebtoken");
 const app = require("../src/langrec-app");

@@ -2,6 +2,7 @@ function makeResourcesArray() {
   return [
     {
       id: 1,
+      user_id: 1,
       title: "Test Title 1",
       image_link:
         "https://images-na.ssl-images-amazon.com/images/I/51JwrB7zAcL._SX348_BO1,204,203,200_.jpg",
@@ -15,6 +16,7 @@ function makeResourcesArray() {
     },
     {
       id: 2,
+      user_id: 1,
       title: "Test Title 2",
       image_link:
         "https://images-na.ssl-images-amazon.com/images/I/51JwrB7zAcL._SX348_BO1,204,203,200_.jpg",
@@ -28,6 +30,7 @@ function makeResourcesArray() {
     },
     {
       id: 3,
+      user_id: 1,
       title: "Test Title 3",
       image_link:
         "https://images-na.ssl-images-amazon.com/images/I/51JwrB7zAcL._SX348_BO1,204,203,200_.jpg",
