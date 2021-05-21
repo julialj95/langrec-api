@@ -33,6 +33,7 @@ ResourcesRouter.route("/")
   })
   .post(requireAuth, jsonParser, (req, res, next) => {
     const user_id = req.user.id;
+    console.log("user_id", user_id);
     const {
       title,
       image_link,
@@ -56,15 +57,16 @@ ResourcesRouter.route("/")
       cost,
       description,
     };
+    console.log("newResource", newResource);
 
-    ResourcesService.submitResource(req.app.get("db"), newResource).then(
-      (response) => {
+    ResourcesService.submitResource(req.app.get("db"), newResource)
+      .then((response) => {
         res
           .status(201)
           .location(path.posix.join(req.originalUrl + `${user_id}`))
-          .send(() => serializeResource(response));
-      }
-    );
+          .json(serializeResource(response));
+      })
+      .catch(next);
   });
 
 ResourcesRouter.route("/saved-resources").get(requireAuth, (req, res, next) => {
