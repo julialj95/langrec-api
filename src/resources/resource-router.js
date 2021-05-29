@@ -63,7 +63,7 @@ ResourcesRouter.route("/")
       .then((response) => {
         res
           .status(201)
-          .location(path.posix.join(req.originalUrl + `${user_id}`))
+          .location(path.posix.join(req.originalUrl + `/${user_id}`))
           .json(serializeResource(response));
       })
       .catch(next);
