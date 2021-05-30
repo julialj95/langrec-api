@@ -5,6 +5,7 @@ const { makeResourcesArray } = require("./resources-fixture");
 const { makeUsersArray } = require("./users-fixture");
 const { makeSavedResourcesArray } = require("./saved-resources-fixture");
 const supertest = require("supertest");
+const { expect } = require("chai");
 
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   const token = jwt.sign({ id: user.id }, secret, {
@@ -49,8 +50,13 @@ describe("Langrec endpoints", function () {
       context(`Given there are resources in the database`, () => {
         const testResources = makeResourcesArray();
         const testUsers = makeUsersArray();
-        beforeEach("insert test resources", () => {
-          return db.into("resources").insert(testResources);
+        beforeEach("insert test users and resources", () => {
+          return db
+            .into("users")
+            .insert(testUsers)
+            .then(() => {
+              return db.into("resources").insert(testResources);
+            });
         });
 
         it("responds with 200 and all of the resources", () => {
@@ -61,57 +67,65 @@ describe("Langrec endpoints", function () {
       });
     });
 
-    //  ***Resource submission functionality has been removed from this iteration due to time constraints. Will be added later.
-    // describe("POST /api/resources", () => {
-    //   const testUsers = makeUsersArray();
-    //   beforeEach("insert test users into database", () => {
-    //     return db.into("users").insert(testUsers);
-    //   });
-    //   it("Creates a new resource and responds with 201 and the submitted resource", () => {
-    //     const newResource = {
-    //       title: "Test resource",
-    //       image_link: "http://www.google.com/images",
-    //       language: "Spanish",
-    //       level: "Beginner",
-    //       type: "Storybook",
-    //       rating: 4,
-    //       url: "http://www.amazon.com",
-    //       description: "Test resource description",
-    //       cost: "Paid",
-    //     };
-    //     return supertest(app)
-    //       .post("/api/resources")
-    //       .set("Authorization", makeAuthHeader(testUsers[0]))
-    //       .send(newResource)
-    //       .expect(201)
-    //       .expect((res) => {
-    //         expect(res.body.title).to.eql(newResource.title);
-    //         expect(res.body.image_link).to.eql(newResource.image_link);
-    //         expect(res.body.language).to.eql(newResource.language);
-    //         expect(res.body.level).to.eql(newResource.level);
-    //         expect(res.body.type).to.eql(newResource.type);
-    //         expect(res.body.rating).to.eql(newResource.rating);
-    //         expect(res.body.url).to.eql(newResource.url);
-    //         expect(res.body.description).to.eql(newResource.description);
-    //         expect(res.body.cost).to.eql(newResource.cost);
-    //         expect(res.body).to.have.property("id");
-    //         expect(res.headers.location).to.eql(
-    //           `/api/resources/${res.body.id}`
-    //         );
-    //       })
-    //       .then((res) =>
-    //         supertest(app)
-    //           .get(`/api/resources/${res.body.id}`)
-    //           .set("Authorization", makeAuthHeader(testUsers[0]))
-    //           .expect(res.body)
-    //       );
-    //   });
-    // });
+    describe("POST /api/resources", () => {
+      const testUsers = makeUsersArray();
+      beforeEach("insert test users into database", () => {
+        return db.into("users").insert(testUsers);
+      });
+      it("Creates a new resource and responds with 201 and the submitted resource", () => {
+        const newResource = {
+          title: "Test resource",
+          user_id: testUsers[0].id,
+          image_link: "http://www.google.com/images",
+          language: "Spanish",
+          level: "Beginner",
+          type: "Storybook",
+          rating: 4,
+          url: "http://www.amazon.com",
+          description: "Test resource description",
+          cost: "Paid",
+        };
+        return supertest(app)
+          .post("/api/resources")
+          .set("Authorization", makeAuthHeader(testUsers[0]))
+          .send(newResource)
+          .expect(201)
+          .expect((res) => {
+            console.log("res.body", res.body);
+            expect(res.body.title).to.eql(newResource.title);
+            expect(res.body.user_id).to.eql(newResource.user_id);
+            expect(res.body.image_link).to.eql(newResource.image_link);
+            expect(res.body.language).to.eql(newResource.language);
+            expect(res.body.level).to.eql(newResource.level);
+            expect(res.body.type).to.eql(newResource.type);
+            expect(res.body.rating).to.eql(newResource.rating);
+            expect(res.body.url).to.eql(newResource.url);
+            expect(res.body.description).to.eql(newResource.description);
+            expect(res.body.cost).to.eql(newResource.cost);
+            expect(res.body).to.have.property("id");
+            expect(res.headers.location).to.eql(
+              `/api/resources/${res.body.id}`
+            );
+          })
+          .then((res) =>
+            supertest(app)
+              .get(`/api/resources/${res.body.id}`)
+              .set("Authorization", makeAuthHeader(testUsers[0]))
+              .expect(res.body)
+          );
+      });
+    });
 
     describe("GET /api/resources/recs", () => {
       const testResources = makeResourcesArray();
-      beforeEach("insert test resources", () => {
-        return db.into("resources").insert(testResources);
+      const testUsers = makeUsersArray();
+      beforeEach("insert test users and resources", () => {
+        return db
+          .into("users")
+          .insert(testUsers)
+          .then(() => {
+            return db.into("resources").insert(testResources);
+          });
       });
       context(
         "Given resources in the database, but none match the requirements",
@@ -136,13 +150,13 @@ describe("Langrec endpoints", function () {
       });
     });
 
-    describe("POST /api/resources/recs", () => {
-      const testUsers = makeUsersArray();
-      beforeEach("insert test users into database", () => {
-        return db.into("users").insert(testUsers);
-      });
-      it("Adds a new saved resource and returns 201", () => {});
-    });
+    // describe("POST /api/resources/recs", () => {
+    //   const testUsers = makeUsersArray();
+    //   beforeEach("insert test users into database", () => {
+    //     return db.into("users").insert(testUsers);
+    //   });
+    //   it("Adds a new saved resource and returns 201", () => {});
+    // });
     //Patch functionality has been removed from this iteration of the app (will be added later as time allows)
     // describe("PATCH /api/resources/:resource_id", () => {
     //   const testUsers = makeUsersArray();
@@ -205,10 +219,10 @@ describe("Langrec endpoints", function () {
       const savedResources = makeSavedResourcesArray();
       beforeEach("insert test resources", () => {
         return db
-          .into("resources")
-          .insert(testResources)
+          .into("users")
+          .insert(testUsers)
           .then(() => {
-            return db.into("users").insert(testUsers);
+            return db.into("resources").insert(testResources);
           })
           .then(() => {
             return db.into("saved_resources").insert(savedResources);
