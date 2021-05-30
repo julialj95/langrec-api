@@ -61,6 +61,7 @@ ResourcesRouter.route("/")
 
     ResourcesService.submitResource(req.app.get("db"), newResource)
       .then((response) => {
+        console.log("user_id", user_id);
         res
           .status(201)
           .location(path.posix.join(req.originalUrl + `/${user_id}`))

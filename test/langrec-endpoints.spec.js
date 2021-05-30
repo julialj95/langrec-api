@@ -89,7 +89,6 @@ describe("Langrec endpoints", function () {
           .post("/api/resources")
           .set("Authorization", makeAuthHeader(testUsers[0]))
           .send(newResource)
-          .expect(201)
           .expect((res) => {
             console.log("res.body", res.body);
             expect(res.body.title).to.eql(newResource.title);
@@ -107,12 +106,14 @@ describe("Langrec endpoints", function () {
               `/api/resources/${res.body.id}`
             );
           })
-          .then((res) =>
-            supertest(app)
+          .expect(201)
+          .then((res) => {
+            console.log("res.body second expect", res.body);
+            return supertest(app)
               .get(`/api/resources/${res.body.id}`)
               .set("Authorization", makeAuthHeader(testUsers[0]))
-              .expect(res.body)
-          );
+              .expect(res.body);
+          });
       });
     });
 
