@@ -69,6 +69,20 @@ ResourcesRouter.route("/")
       })
       .catch(next);
   });
+ResourcesRouter.route("/submitted-resources").get(
+  requireAuth,
+  (req, res, next) => {
+    const user_id = req.user.id;
+    ResourcesService.getSubmittedResources(req.app.get("db"), user_id)
+      .then((resources) => {
+        if (!resources) {
+          return res.status(400).send("No resources found.");
+        }
+        res.json(resources);
+      })
+      .catch(next);
+  }
+);
 
 ResourcesRouter.route("/saved-resources").get(requireAuth, (req, res, next) => {
   const user_id = req.user.id;
